@@ -1,8 +1,6 @@
-# EinstarSDK
 
-Einstar SDK
 
-1 How to Compile and Use the SDK Demo
+How to Compile and Use the SDK Demo
 
 1. Download and install the Professional or Enterprise version of Microsoft Visual Studio 2017 for Windows. Set the development environment to C++.
 2. Download the CMake tool.
