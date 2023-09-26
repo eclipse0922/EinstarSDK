@@ -46,7 +46,12 @@ typedef void(CALLBACK *Sn3DScanDistCallBack)(double scanDist, void* owner);
 typedef void(CALLBACK *Sn3DMeshDataCallBack)(LPSn3dMeshData meshData, void* owner);
 //Get device event callback function
 typedef void(CALLBACK *Sn3DDeviceEventCallBack)(DeviceEvent event, void* owner);
-
+//Get currnt marker infomation
+typedef void(CALLBACK *Sn3DCurrentMarkerCallBack)(LPSn3DMakerData currentMarker, void* owner);
+//Get Whole marker information
+typedef void(CALLBACK *Sn3DWholeMarkerCallBack)(LPSn3DMakerData wholeMarker, void* ownner);
+//Get too flat callback function
+typedef void(CALLBACK *Sn3DTooFlatStatusCallBack)(bool tooFlatStatus, void* owner);
 /*!
 * @brief 定义获图片的回调      
 * param camId 相机索引					Index of Camera
@@ -360,6 +365,27 @@ SN3DSDKE10API int CALLMETHOD Sn3DSetScanDistCallBack(Sn3DScanDistCallBack callBa
 * @return 0成功，失败参考错误码
 */
 SN3DSDKE10API int CALLMETHOD Sn3DSetDeviceEventCallBack(Sn3DDeviceEventCallBack callBackFunc, void* owner);
+
+/*
+* @brief 注册回调, 当前标志点刷新触发			Register current marker callback
+* @param callBackFunc 回调函数				device event callback
+* @return 0成功，失败参考错误码
+*/
+SN3DSDKE10API int CALLMETHOD Sn3DSetCurrentMarkerCallBack(Sn3DCurrentMarkerCallBack callBackFunc, void* owner);
+
+/*
+* @brief 注册回调, 全量标志点刷新触发		Register whole marker callback
+* @param callBackFunc 回调函数				device event callback
+* @return 0成功，失败参考错误码
+*/
+SN3DSDKE10API int CALLMETHOD Sn3DSetWholeMarkerCallBack(Sn3DWholeMarkerCallBack callBackFunc, void* owner);
+
+/*!
+* @brief 注册回调, 平面提示状态数据刷新触发		Register too flat status callback
+* @param callBackFunc 回调函数					track loss status callback
+* @return 0成功，失败参考错误码
+*/
+SN3DSDKE10API int CALLMETHOD Sn3DSetTooFlatStatusCallBack(Sn3DTooFlatStatusCallBack callBackFunc, void* owner);
 
 #ifdef __cplusplus
 }

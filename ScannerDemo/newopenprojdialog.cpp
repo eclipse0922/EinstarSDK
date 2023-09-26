@@ -1,4 +1,4 @@
-#include "newopenprojdialog.h"
+ #include "newopenprojdialog.h"
 #include "ui_newopenprojdialog.h"
 #include "qfiledialog.h"
 

@@ -14,6 +14,7 @@
 //#include "transmem.h"
 #include "PublicClass.h"
 #include <iostream>
+
 namespace Ui {
 class Sn3DMainWindow;
 }
@@ -54,6 +55,9 @@ public:
 	Sn3DCameraPositionCallBack	m_Sn3DGetCameraPosition;
 	Sn3DTrackLostStatusCallBack m_Sn3DGetTrackLostStatus;
 	Sn3DScanDistCallBack m_Sn3DGetScanDist;
+	Sn3DCurrentMarkerCallBack m_Sn3DGetCurrentMarker;
+	Sn3DWholeMarkerCallBack m_Sn3DGetWholeMarker;
+	Sn3DTooFlatStatusCallBack m_Sn3DGetTooFlatStatus;
 	//widget state control
 	enum StateControl
 	{
@@ -161,6 +165,11 @@ private:
 	void getTrackLostStatus(bool status);
 	void getScanDist(double dist);
 	void getDeviceEvent(DeviceEvent event);
+	//获取当前标志点信息
+	void getCurrentMarker(LPSn3DMakerData currentMarker);
+	void getWholeMarker(LPSn3DMakerData wholeMarker);
+	void getTooFlatStatus(bool status);
+
 private:
 	Ui::Sn3DMainWindow *ui;
 	//calib type

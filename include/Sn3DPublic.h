@@ -81,6 +81,31 @@ typedef struct {
 	//纹理图
 	Sn3DImage		image;				//texture image
 }Sn3DMeshData, *LPSn3dMeshData;
+
+//typedef struct {
+//	int				marker_count;
+//	LPSn3dPointData	coord;          //坐标
+//	LPSn3dPointData	normal;         //法向
+//	double*			diameter; //直径
+//	int*            codeId;     //编码点ID(<=0即为普通的标志点)
+//}Sn3DMarkerData, *LPSn3DMakerData;
+
+
+//单个标志点信息 single marker
+struct MarkerInfo
+{
+	Sn3dPointData	coord;          //坐标  data of marker
+	Sn3dPointData	normal;         //法向	data of noraml
+	double			diameter;		//直径	diameter
+	int             codeId;			//编码点ID(<=0即为普通的标志点)  marker id (<=0 means common marker)
+};
+
+typedef struct {
+	int			marker_count;		//marker count
+	MarkerInfo* markerList;			//marker list
+}Sn3DMarkerData, *LPSn3DMakerData;
+
+
 //typedef struct _tagSn3DVariant
 //{
 //	int type;

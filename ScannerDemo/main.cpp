@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
 	ScannerDemo w;
 	w.initCameraVideo();
 #else
-	//ScannerDemo w;
-	Sn3DMainWindow w;
+    //ScannerDemo w;
+    Sn3DMainWindow w;
 #endif
     // SDKLogger::createInstanc(); // for debug only
 	w.show();

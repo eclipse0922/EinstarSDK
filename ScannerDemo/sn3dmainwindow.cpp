@@ -266,6 +266,17 @@ void Sn3DMainWindow::on_pushButton_connectService_clicked()
 	m_Sn3DGetScanDist = [](double dist, void*) {
 
 	};
+
+	m_Sn3DGetCurrentMarker = [](LPSn3DMakerData currentMarker, void*) {
+
+	};
+	m_Sn3DGetWholeMarker = [](LPSn3DMakerData wholeMarker, void*) {
+
+	};
+
+	m_Sn3DGetTooFlatStatus = [](bool flat, void*) {
+
+	};
 	//Sn3DScanServiceWather f = std::bind(&Sn3DMainWindow::getSn3DServerStatus, this, std::placeholders::_1);
 
 	int connectResult = Sn3DInitialize(m_Sn3DWatchFun);
@@ -277,6 +288,8 @@ void Sn3DMainWindow::on_pushButton_connectService_clicked()
 		Sn3DSetCameraPositionCallBack(m_Sn3DGetCameraPosition, nullptr);
 		Sn3DSetTrackLostStatusCallBack(m_Sn3DGetTrackLostStatus, nullptr);
 		Sn3DSetScanDistCallBack(m_Sn3DGetScanDist, nullptr);
+		//Sn3DSetCurrentMarkerCallBack(m_Sn3DGetCurrentMarker, nullptr);
+
 
 		ui->pushButton_connectService->setEnabled(false);
 		ui->pushButton_checkDeviceOnline->setEnabled(true);
@@ -299,7 +312,6 @@ void Sn3DMainWindow::on_pushButton_checkDeviceOnline_clicked()
 	m_isClickedCheckDevice = true;
 	int ret = Sn3DConnectDevice();
 	qDebug() << __FUNCTION__ << __LINE__;
-
 	if (ret == 0)
 	{
 		switchInterfaceState(DEVICE_ONLINE_STATE); // 设备连接成功
@@ -1578,6 +1590,7 @@ void watcherCallBack(int ret)
 #include <ctime>
 void getWholeCloudCallBack(LPSn3dPointCloud wholePointCloud)
 {
+	qDebug() << "-------------SAVE WHOLE CLOUD!";
 	std::ofstream ofs;
 	std::string callBackPath("./demo/Whole/");
 	callBackPath.append(std::to_string(std::time(0)));
@@ -1612,6 +1625,7 @@ void Sn3DMainWindow::getCurrentCloud(LPSn3dPointCloud currentPointCloud)
 	pointCloud->vertex_data = new Sn3dPointData[pointCloud->vertex_count];
 	pointCloud->norma_data = new Sn3dPointData[pointCloud->norma_count];
 	pointCloud->vertex_color_data = new Sn3dPointData[pointCloud->vertex_color_count];
+
 
 	memcpy(pointCloud->vertex_data, currentPointCloud->vertex_data, sizeof(float) * 3 * pointCloud->vertex_count);
 	memcpy(pointCloud->norma_data, currentPointCloud->norma_data, sizeof(float) * 3 * pointCloud->norma_count);
@@ -1734,7 +1748,21 @@ void Sn3DMainWindow::getCameraPosition(LPSn3dCameraPosition cameraPosition)
 
 void Sn3DMainWindow::getTrackLostStatus(bool status)
 {
+	if (status)
+	{
+		slot_printInfo(QString("track lost!"), LogType::ERROR_MESSAGE);
+	}
 	qDebug() << "************* track lost status **************" << status;
+}
+
+void Sn3DMainWindow::getTooFlatStatus(bool status)
+{
+	if (status)
+	{
+		slot_printInfo(QString("please use marker to scan plane"), LogType::ERROR_MESSAGE);
+	}
+	qDebug() << "************* too flat status **************" << status;
+
 }
 
 void Sn3DMainWindow::getScanDist(double dist)
@@ -1746,8 +1774,9 @@ void Sn3DMainWindow::getMeshData(LPSn3dMeshData meshData)
 {
 	std::ofstream ofs;
 	std::string callBackPath("./demo/MeshData/");
-	
-	
+	//
+	//QString str = "<font color=\"#FF0000\">" + QString::fromStdString(std::to_string(meshData->meshpoint_count) + " meshpoint_count") + "</font>";
+	//ui->textBrowser->append(str);
 	if (meshData->meshpoint_count)
 	{
 		std::string name("meshpoint.asc");
@@ -1856,17 +1885,20 @@ void Sn3DMainWindow::getDeviceEvent(DeviceEvent event)
 
 void Sn3DMainWindow::on_pushButton_End_clicked()
 {
+	
 	SN3DERROR t_ret = EC_SUCCESS;
 	char* t_sln_path = "./demo/demo";
 	char* t_prj_path = "./demo/Project1.ir_E10_prj";
 	char* t_save_path = "./demo/data";
 	ScanMode t_scan_mode = AT_OBJECT;
-	MeshType t_mesh_type = AT_HALFWATERTIGHT;
+	MeshType t_mesh_type = AT_UNWATERTIGHT;
 	bool t_hasTexture = false;
 	bool t_isCreate = true;
 	float t_point_dis = 1.f;
 	bool t_globalOpt = true;
 	char* t_globalMaker = "";
+
+
 	if (t_ret == EC_SUCCESS)
 	{
 		t_ret = Sn3DPauseScan();
@@ -1879,10 +1911,8 @@ void Sn3DMainWindow::on_pushButton_End_clicked()
 		t_ret = Sn3DEndScan(
 			t_globalOpt, 
 			t_point_dis, 
-			getWholeCloudCallBack);
-		
+			getWholeCloudCallBack);		
 	}
-
 	//saveasc
 	if (t_ret == EC_SUCCESS)
 	{
@@ -1910,6 +1940,9 @@ void Sn3DMainWindow::on_pushButton_End_clicked()
 			SN3D_MAX_FACELIMIT,
 			this,
 			getMestDataCallback);
+		std::string brightness_min = "get mesh data result " + std::to_string(t_ret);
+		std::string str = "<font color = \"#FF0000\">" + brightness_min + "</font>";
+		ui->textBrowser->append(QString::fromStdString(str));
 	}
 	//saveply
 	if (t_ret == EC_SUCCESS)
@@ -1931,8 +1964,33 @@ void Sn3DMainWindow::on_pushButton_End_clicked()
 		ui->pushButton_End->setEnabled(false);
 	}
 }
-void Sn3DMainWindow::on_pushButton_Process_clicked()
+
+void Sn3DMainWindow::getCurrentMarker(LPSn3DMakerData currentMarker)
 {
+	std::string printinfo = "<font color = \"#FF0000\">" + std::to_string(currentMarker->marker_count) +  "current marker size" + "<\font>";
+	slot_printInfo(QString::fromStdString(printinfo), RECEIVE_MESSAGE);
+	qDebug() << "--------current marker information\n";
+	for (size_t i = 0; i < currentMarker->marker_count; i++)
+	{
+		qDebug() << "id " << currentMarker->markerList[i].codeId << "diameter " << currentMarker->markerList[i].diameter << " " << currentMarker->markerList[i].coord.x << " " 
+			<< currentMarker->markerList[i].coord.y << " " << currentMarker->markerList[i].coord.z;
+	}
+}
+
+void Sn3DMainWindow::getWholeMarker(LPSn3DMakerData wholeMarker)
+{
+	std::string printinfo = "whole maker size" + std::to_string(wholeMarker->marker_count);
+	slot_printInfo(QString::fromStdString(printinfo), RECEIVE_MESSAGE);
+	qDebug() << "--------whole marker information\n";
+	for (size_t i = 0; i < wholeMarker->marker_count; i++)
+	{
+		qDebug() << "id " << wholeMarker->markerList[i].codeId << "diameter " << wholeMarker->markerList[i].diameter << " " << wholeMarker->markerList[i].coord.x << " "
+			<< wholeMarker->markerList[i].coord.y << " " << wholeMarker->markerList[i].coord.z;
+	}
+}
+void Sn3DMainWindow::on_pushButton_Process_clicked()
+{	
+	
 	ui->pushButton_Process->setEnabled(false);
 	ui->pushButton_End->setEnabled(true);
 	
@@ -1942,9 +2000,9 @@ void Sn3DMainWindow::on_pushButton_Process_clicked()
 	char* t_prj_path = "./demo/Project1.ir_E10_prj";
 	char* t_save_path = "./demo/data";
 	ScanMode t_scan_mode = AT_OBJECT;
-	MeshType t_mesh_type = AT_HALFWATERTIGHT;
-	AlignType t_align_type = AT_FEATURES;
-	bool t_hasTexture = false;	//LSC 修改，不带纹理
+	MeshType t_mesh_type = AT_UNWATERTIGHT;
+	AlignType t_align_type = AT_HYBRID;
+    bool t_hasTexture = true;	//LSC 修改，不带纹理
 	bool t_isCreate = true;
 	float t_point_dis = 1.f;
 	bool t_globalOpt = true;
@@ -1961,12 +2019,11 @@ void Sn3DMainWindow::on_pushButton_Process_clicked()
 	{
 		t_ret = Sn3DEnterScan();
 
-
 		//LSC 获取设备相机亮度范围最大值与最小值，并设置相机亮度为其中间值
 		Sn3DGetBrightnessRange(BrightnessMin, BrightnessMax);
 		BrightnessLevel = BrightnessMax;
 		Sn3DSetBrightness(BrightnessLevel);
-		qDebug() << "Sn3DGetBrightnessRange BrightnessMin" << BrightnessMin;
+ 		qDebug() << "Sn3DGetBrightnessRange BrightnessMin" << BrightnessMin;
 		qDebug() << "Sn3DGetBrightnessRange BrightnessMax" << BrightnessMax;
 	}
 
@@ -2000,6 +2057,7 @@ void Sn3DMainWindow::on_pushButton_Process_clicked()
 		Sn3DIntallGetImagasCallBack(getImageCallback, this); // 注册接受视频流的回调,注意这个函数是非必须的，需要用图片做分析或者其他用途的才调用,
 															  // 如果想终止直接Sn3DIntallGetImagasCallBack(nullptr, nullptr);
 		t_ret = Sn3DPreviewScan();
+
 	}
 	//scan
 	if (t_ret == EC_SUCCESS)
@@ -2009,6 +2067,17 @@ void Sn3DMainWindow::on_pushButton_Process_clicked()
 		};
 		Sn3DSetCurrentPointCloudCallBack(getCurrentPointCloudCallback, this); // 注册接受当前帧的回调
 																	// 如果想终止直接Sn3DSetCurrentPointCloudCallBack(nullptr, nullptr);
+
+		auto getCurrentMarkerCallBack = [](LPSn3DMakerData currentMarker, void* owner) {
+			((Sn3DMainWindow*)owner)->getCurrentMarker(currentMarker);
+		};
+		Sn3DSetCurrentMarkerCallBack(getCurrentMarkerCallBack, this); // 注册当前帧标志点信息的回调
+
+
+		auto getWholeMarkerCallBack = [](LPSn3DMakerData wholeMarker, void* owner) {
+			((Sn3DMainWindow*)owner)->getWholeMarker(wholeMarker);
+		};
+		Sn3DSetWholeMarkerCallBack(getWholeMarkerCallBack, this); // 注册全量标志点信息的回调
 
 		auto getIncreasePointCloudCallback = [](LPSn3dIncreasePointCloud increasePointCloud, void* owner) {
 			((Sn3DMainWindow*)owner)->getIncreaseCloud(increasePointCloud);
@@ -2034,13 +2103,21 @@ void Sn3DMainWindow::on_pushButton_Process_clicked()
 		Sn3DSetScanDistCallBack(getScanDIstCallback, this); // 注册接受跟踪距离挡位回调
 																	// 如果想终止直接Sn3DSetScanDistCallBack(nullptr, nullptr);
 
+
+		auto getTooFlatStatusCallback = [](bool status, void* owner) {
+			((Sn3DMainWindow*)owner)->getTooFlatStatus(status);
+		};
+		Sn3DSetTooFlatStatusCallBack(getTooFlatStatusCallback, this); // 注册接受平面提示回调
+																	// 如果想终止直接Sn3DSetTooFlatStatusCallBack(nullptr, nullptr);
+
+
 		auto getDeviceEventCallBack = [](DeviceEvent event, void* owner){
 			((Sn3DMainWindow*)owner)->getDeviceEvent(event);
 		};
 		Sn3DSetDeviceEventCallBack(getDeviceEventCallBack, this);
 		t_ret = Sn3DStartScan();
 	}
-
+	
 
 	if (t_ret != EC_SUCCESS)
 	{

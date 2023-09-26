@@ -136,9 +136,12 @@ public:
 	void setDeviceEventCallBack(std::function<void(DeviceEvent, void*)> func, void* owner);
 
 	void setMeshCallBack(std::function<void(LPSn3dPointCloud)> func);
+	void setCurrentMarkerCallBack(std::function<void(LPSn3DMakerData, void*)>, void* owner);
+	void setWholeMarkerCallBack(std::function<void(LPSn3DMakerData, void*)>, void* owener);
 	//LSC IMP中声明网格回调函数Ex
 	void setMeshCallBackEx(std::function<void(LPSn3dMeshData, void*)> func, void* owner);
 	//void waitForCheckDeviceProcess();
+	void setTooFlatStatusCallBack(std::function<void(bool, void*)> func, void* owner);
 
 
 public slots:
@@ -225,6 +228,8 @@ private:
 	void* m_ScanDist_owner = nullptr;
 	std::function<void(DeviceEvent, void*)> m_DeviceEventCallBack = nullptr;
 	void* m_DeviceEvent_owner = nullptr;
+	std::function<void(bool, void* owner)> m_TooFlatCallBack = nullptr;
+	void* m_TooFlatStatus_owner = nullptr;
 
 	QMutex m_callbackMutex;
 };

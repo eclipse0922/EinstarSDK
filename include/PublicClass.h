@@ -225,9 +225,9 @@ enum AlignType {
 	AT_FEATURES = 0,         // features align
 	AT_MARKERS = 1,          // markers algin
 	AT_HYBRID = 2,           // features and markers mix align,first use markers ,if failed use features align again. 
-	AT_AUTO = 4,            // auto switch(if start scanning detect markers use markers align ,else use features align)
-	AT_TURTABLE = 5,	     //turtable align
-	AT_CODE_POINT = 6,	      //code point align
+	//AT_AUTO = 4,            // auto switch(if start scanning detect markers use markers align ,else use features align)
+	//AT_TURTABLE = 5,	     //turtable align
+	//AT_CODE_POINT = 6,	      //code point align
 	AT_GLOBAL_POINT = 7,        //frame markers align
 	AT_TEXTURE = 8        //texture align
 };

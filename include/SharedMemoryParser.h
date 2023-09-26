@@ -77,6 +77,7 @@ public:
 		sn3d_smc_initialize();
 	}
 	~SharedMemoryParser() {}
+
 	int getCameraVideo(int camera_id, char**image, int&width, int&height, int&channel);
 	int getWholePointData();
 	int renderScenData(QString memKey); // hx1.3 E10
@@ -130,6 +131,19 @@ public:
 		m_MeshCallBackFunc = meshCallBackFunc;
 	}
 
+	void setCurrentMarkerCallBack(std::function<void(LPSn3DMakerData, void*)> currentMarkerCallBack, void* owner)
+	{
+		m_CurrentMarkerCallBackFunc = currentMarkerCallBack;
+		m_CurrentMarker_owner = owner;
+	}
+
+	void setWholeMarkerCallBack(std::function<void(LPSn3DMakerData, void*)> wholeMarkerCallBack, void* owener)
+	{
+		m_WholeMarkerCallBackFunc = wholeMarkerCallBack;
+		m_WholeMarker_owner = owener;
+	}
+
+
 private:
 	int savePointInMemory(LPSMC_POINTS pointData);
 
@@ -165,5 +179,14 @@ private:
 	//LSC SharedMemoryÖÐÉùÃ÷callbackºÍowner
 	std::function<void(LPSn3dMeshData, void*)> m_MeshCallBackFuncEx = nullptr;
 	void* m_MeshData_owner = nullptr;
+
+	std::function<void(LPSn3DMakerData, void*)> m_CurrentMarkerCallBackFunc = nullptr;
+	void* m_CurrentMarker_owner = nullptr;
+
+	//whole marker
+	std::function<void(LPSn3DMakerData, void*)> m_WholeMarkerCallBackFunc = nullptr;
+	void* m_WholeMarker_owner = nullptr;
+
+
 };
 

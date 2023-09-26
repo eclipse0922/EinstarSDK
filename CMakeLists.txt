@@ -32,7 +32,7 @@ function(set_project_compile_definitions targetName compileFlagsInRelease)
 	endif()
 endfunction(set_project_compile_definitions)
 
-find_package(Qt5 COMPONENTS Core Gui Widgets remoteobjects REQUIRED CONFIG)
+find_package(Qt5 COMPONENTS Core Gui Widgets remoteobjects Concurrent REQUIRED CONFIG)
 
 get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
 get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
